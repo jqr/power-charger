@@ -35,6 +35,16 @@ Clone this repo, then run the install script:
 
 This symlinks the repo into your Factorio mods directory.
 
+### Dedicated server
+
+Ensure `auto_download_mods` is `true` in your server's `server-settings.json`, then add the mod to `mods/mod-list.json`:
+
+```json
+{ "name": "power-charger", "enabled": true }
+```
+
+Restart the server and connecting players will be prompted to install the mod automatically.
+
 ## Settings
 
 | Setting | Default | Description |

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.1.0
+Date: 25. 02. 2026
+
+  Features:
+    - Automatically charges armor batteries from the electric network when standing near power poles
+    - Charges as fast as your network can deliver — no artificial rate limit
+    - Power consumption shows in electric network statistics per battery type
+    - Blue lightning arc visual effect from pole to player while charging
+    - Works with all electric pole types (small, medium, big, substation)
+    - Multiplayer compatible
+  Settings:
+    - Configurable update interval (default 30 ticks / twice per second)

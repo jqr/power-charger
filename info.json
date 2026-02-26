@@ -1,0 +1,9 @@
+{
+  "name": "power-charger",
+  "version": "0.1.0",
+  "title": "Power Charger",
+  "author": "jqr",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0"],
+  "description": "Charges your armor batteries from the electric network when you're near power poles. No need to wait for solar/fusion/etc if you're within your base!"
+}

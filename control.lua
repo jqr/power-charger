@@ -16,6 +16,7 @@ local DEFAULT_POLE_HEIGHT = -2.5
 
 local function init_storage()
   storage.shadows = storage.shadows or {}       -- [player_index][battery_name] = entity
+  storage.player_surfaces = storage.player_surfaces or {} -- [player_index] = surface_index
 end
 
 local function destroy_shadows(player_index)
@@ -26,6 +27,7 @@ local function destroy_shadows(player_index)
     end
   end
   storage.shadows[player_index] = nil
+  storage.player_surfaces[player_index] = nil
 end
 
 local function is_within_supply_area(player_pos, pole)
@@ -172,6 +174,20 @@ local function remove_shadow(player_index, battery_name)
   shadows[battery_name] = nil
 end
 
+-- Check if player changed surface (e.g. went to another planet)
+local function check_surface_change(player)
+  local current = player.surface.index
+  local prev = storage.player_surfaces[player.index]
+  storage.player_surfaces[player.index] = current
+  if prev and prev ~= current then
+    -- Surface changed — destroy old shadows (they're on the wrong surface)
+    destroy_shadows(player.index)
+    -- Re-init the surface tracker since destroy_shadows clears it
+    storage.player_surfaces[player.index] = current
+    return true
+  end
+  return false
+end
 
 -- Visual-only: redraw arcs every ARC_INTERVAL ticks
 local function on_arc_tick(event)
@@ -193,6 +209,8 @@ end
 -- Charging logic: runs at the configured interval
 local function on_charge_tick(event)
   for _, player in pairs(game.connected_players) do
+    check_surface_change(player)
+
     local grid = get_battery_grid(player)
     if not grid or grid.battery_capacity <= 0 then
       destroy_shadows(player.index)
@@ -258,7 +276,6 @@ script.on_nth_tick(CHARGE_INTERVAL, on_charge_tick)
 
 script.on_configuration_changed(function()
   init_storage()
-  -- Clean up any invalid shadow entities
   for idx, shadows in pairs(storage.shadows) do
     for bname, entity in pairs(shadows) do
       if not entity.valid then
@@ -271,15 +288,10 @@ script.on_configuration_changed(function()
   end
 end)
 
--- Always register the tick handler (runs on init and load)
-register_tick_handler()
-
-script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
-  if event.setting == "power-charger-interval-ticks" then
-    register_tick_handler()
-  end
+script.on_event(defines.events.on_pre_player_removed, function(event)
+  destroy_shadows(event.player_index)
 end)
 
-script.on_event(defines.events.on_pre_player_removed, function(event)
+script.on_event(defines.events.on_player_changed_surface, function(event)
   destroy_shadows(event.player_index)
 end)

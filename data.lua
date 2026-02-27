@@ -35,6 +35,11 @@ local battery_types = {
   ["battery-mk2-equipment"] = "__base__/graphics/icons/battery-mk2-equipment.png",
 }
 
+-- Add MK3 battery if Space Age DLC is active
+if mods["space-age"] then
+  battery_types["battery-mk3-equipment"] = "__space-age__/graphics/icons/battery-mk3-equipment.png"
+end
+
 for battery_name, icon_path in pairs(battery_types) do
   local shadow = table.deepcopy(shadow_base)
   shadow.name = "power-charger-" .. battery_name

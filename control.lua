@@ -1,6 +1,8 @@
 -- Power Charger: charges armor batteries from the electric network
 
-local SEARCH_RADIUS = 18 -- tiles, covers largest pole supply area (substation)
+local SEARCH_RADIUS = 18    -- tiles, covers largest pole supply area (substation)
+local CHARGE_INTERVAL = 30  -- ticks between charge checks (~2x per second)
+local ARC_INTERVAL = 5      -- ticks between arc redraws
 local PLAYER_CHEST_Y = -1.2
 
 -- Approximate visual height offsets for pole types (negative = up)
@@ -11,10 +13,6 @@ local POLE_HEIGHT = {
   ["substation"]           = -2.5,
 }
 local DEFAULT_POLE_HEIGHT = -2.5
-
-local function get_interval()
-  return settings.global["power-charger-interval-ticks"].value
-end
 
 local function init_storage()
   storage.shadows = storage.shadows or {}       -- [player_index][battery_name] = entity
@@ -86,7 +84,6 @@ local function get_pole_height(pole)
 end
 
 local function draw_charge_arc(player, pole)
-  local ttl = 5 -- very short lived, redrawn every interval for fast flicker
   local pole_pos = pole.position
   local player_pos = player.position
   local dx = player_pos.x - pole_pos.x
@@ -115,7 +112,7 @@ local function draw_charge_arc(player, pole)
         from = prev,
         to = next_ref,
         surface = player.surface,
-        time_to_live = ttl,
+        time_to_live = ARC_INTERVAL,
       }
       prev = next_ref
     end
@@ -125,7 +122,7 @@ local function draw_charge_arc(player, pole)
       from = prev,
       to = {entity = player.character, offset = {0, PLAYER_CHEST_Y}},
       surface = player.surface,
-      time_to_live = ttl,
+      time_to_live = ARC_INTERVAL,
     }
   end
 
@@ -136,7 +133,7 @@ local function draw_charge_arc(player, pole)
     color = {r = 0.2, g = 0.4, b = 1},
     intensity = 0.5,
     scale = 4,
-    time_to_live = ttl,
+    time_to_live = ARC_INTERVAL,
   }
 end
 
@@ -175,9 +172,8 @@ local function remove_shadow(player_index, battery_name)
   shadows[battery_name] = nil
 end
 
-local ARC_INTERVAL = 5 -- ticks between arc redraws
 
--- Visual-only: redraw arcs every 5 ticks
+-- Visual-only: redraw arcs every ARC_INTERVAL ticks
 local function on_arc_tick(event)
   for _, player in pairs(game.connected_players) do
     if not player.character then goto continue end
@@ -251,22 +247,14 @@ local function on_charge_tick(event)
   end
 end
 
-local function register_tick_handler()
-  local interval = get_interval()
-  script.on_nth_tick(nil)
-  script.on_nth_tick(interval, on_charge_tick)
-  script.on_nth_tick(ARC_INTERVAL, on_arc_tick)
-end
-
 -- Lifecycle events
 
 script.on_init(function()
   init_storage()
 end)
 
-script.on_load(function()
-  register_tick_handler()
-end)
+script.on_nth_tick(ARC_INTERVAL, on_arc_tick)
+script.on_nth_tick(CHARGE_INTERVAL, on_charge_tick)
 
 script.on_configuration_changed(function()
   init_storage()

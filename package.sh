@@ -12,7 +12,7 @@ rm -f "$OUT_FILE"
 # Copy mod files into correctly named folder
 mkdir "$TMPDIR/$MOD_NAME"
 cp -r "$SRC_DIR"/info.json "$SRC_DIR"/changelog.txt "$SRC_DIR"/control.lua \
-      "$SRC_DIR"/data.lua "$SRC_DIR"/settings.lua "$SRC_DIR"/thumbnail.png \
+      "$SRC_DIR"/data.lua "$SRC_DIR"/thumbnail.png \
       "$SRC_DIR"/locale \
       "$TMPDIR/$MOD_NAME/"
 

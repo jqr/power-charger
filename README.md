@@ -45,12 +45,6 @@ Ensure `auto_download_mods` is `true` in your server's `server-settings.json`, t
 
 Restart the server and connecting players will be prompted to install the mod automatically.
 
-## Settings
-
-| Setting | Default | Description |
-|---|---|---|
-| Update interval | 30 ticks | How often the mod checks and charges batteries. Lower = smoother, higher = less CPU. |
-
 ## Publishing a new release
 
 1. Update `version` in `info.json`

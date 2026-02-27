@@ -17,6 +17,7 @@ local DEFAULT_POLE_HEIGHT = -2.5
 local function init_storage()
   storage.shadows = storage.shadows or {}       -- [player_index][battery_name] = entity
   storage.player_surfaces = storage.player_surfaces or {} -- [player_index] = surface_index
+  storage.active_poles = storage.active_poles or {}       -- [player_index] = pole entity
 end
 
 local function destroy_shadows(player_index)
@@ -28,6 +29,7 @@ local function destroy_shadows(player_index)
   end
   storage.shadows[player_index] = nil
   storage.player_surfaces[player_index] = nil
+  storage.active_poles[player_index] = nil
 end
 
 local function is_within_supply_area(player_pos, pole)
@@ -193,12 +195,9 @@ end
 local function on_arc_tick(event)
   for _, player in pairs(game.connected_players) do
     if not player.character then goto continue end
-    -- Only draw arcs if we have active shadows (i.e. currently charging)
-    local shadows = storage.shadows[player.index]
-    if not shadows or not next(shadows) then goto continue end
 
-    local pole = find_powered_pole(player)
-    if pole then
+    local pole = storage.active_poles[player.index]
+    if pole and pole.valid then
       draw_charge_arc(player, pole)
     end
 
@@ -227,6 +226,7 @@ local function on_charge_tick(event)
       destroy_shadows(player.index)
       goto continue
     end
+    storage.active_poles[player.index] = pole
 
     local deficits = get_battery_deficits(grid)
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-MOD_NAME="power-charger_0.1.0"
 SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
+VERSION=$(python3 -c "import json; print(json.load(open('$SRC_DIR/info.json'))['version'])")
+MOD_NAME="power-charger_${VERSION}"
 
 # Detect OS and set mods directory
 case "$(uname -s)" in

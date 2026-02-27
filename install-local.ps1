@@ -1,5 +1,6 @@
-$ModName = "power-charger_0.1.0"
 $SrcDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$Info = Get-Content "$SrcDir\info.json" | ConvertFrom-Json
+$ModName = "power-charger_$($Info.version)"
 $ModsDir = "$env:APPDATA\Factorio\mods"
 
 if (-not (Test-Path $ModsDir)) {

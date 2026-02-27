@@ -1,16 +1,16 @@
-$ModName = "power-charger_0.1.0"
 $ModsDir = "$env:APPDATA\Factorio\mods"
-$Target = Join-Path $ModsDir $ModName
+$found = $false
 
-if (Test-Path $Target) {
-    $item = Get-Item $Target -Force
-    if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
-        Remove-Item $Target -Force
-        Write-Host "Removed junction $Target"
+Get-ChildItem "$ModsDir\power-charger_*" -ErrorAction SilentlyContinue | ForEach-Object {
+    if ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+        Remove-Item $_.FullName -Force
+        Write-Host "Removed junction $($_.FullName)"
+        $found = $true
     } else {
-        Write-Error "$Target exists but is not a junction. Remove it manually."
-        exit 1
+        Write-Host "Skipping $($_.FullName) - not a junction. Remove it manually if needed."
     }
-} else {
-    Write-Host "Nothing to remove - $Target does not exist."
+}
+
+if (-not $found) {
+    Write-Host "Nothing to remove - no power-charger junctions found in $ModsDir"
 }

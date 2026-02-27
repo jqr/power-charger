@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-MOD_NAME="power-charger_0.1.0"
-
 case "$(uname -s)" in
   Darwin)
     MODS_DIR="$HOME/Library/Application Support/factorio/mods"
@@ -16,14 +14,18 @@ case "$(uname -s)" in
     ;;
 esac
 
-TARGET="$MODS_DIR/$MOD_NAME"
+found=0
+for target in "$MODS_DIR"/power-charger_*; do
+  [ -e "$target" ] || continue
+  if [ -L "$target" ]; then
+    rm "$target"
+    echo "Removed symlink $target"
+    found=1
+  else
+    echo "Skipping $target — not a symlink. Remove it manually if needed."
+  fi
+done
 
-if [ -L "$TARGET" ]; then
-  rm "$TARGET"
-  echo "Removed symlink $TARGET"
-elif [ -e "$TARGET" ]; then
-  echo "Error: $TARGET exists but is not a symlink. Remove it manually."
-  exit 1
-else
-  echo "Nothing to remove — $TARGET does not exist."
+if [ "$found" -eq 0 ]; then
+  echo "Nothing to remove — no power-charger symlinks found in $MODS_DIR"
 fi

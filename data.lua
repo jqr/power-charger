@@ -29,7 +29,7 @@ local shadow_base = {
   },
 }
 
--- Create a shadow entity for each vanilla battery equipment type
+-- Create a shadow entity for each known battery equipment type
 local battery_types = {
   ["battery-equipment"] = "__base__/graphics/icons/battery-equipment.png",
   ["battery-mk2-equipment"] = "__base__/graphics/icons/battery-mk2-equipment.png",
@@ -41,3 +41,9 @@ for battery_name, icon_path in pairs(battery_types) do
   shadow.icon = icon_path
   data:extend({ shadow })
 end
+
+-- Generic fallback for modded battery types
+local fallback = table.deepcopy(shadow_base)
+fallback.name = "power-charger-generic"
+fallback.icon = "__base__/graphics/icons/battery-equipment.png"
+data:extend({ fallback })

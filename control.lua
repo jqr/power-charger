@@ -136,6 +136,10 @@ local function ensure_shadow(player, battery_name)
     return entity
   end
   local shadow_name = "power-charger-" .. battery_name
+  -- Fall back to generic if no dedicated shadow entity exists for this battery type
+  if not prototypes.entity[shadow_name] then
+    shadow_name = "power-charger-generic"
+  end
   entity = player.surface.create_entity{
     name = shadow_name,
     position = player.position,

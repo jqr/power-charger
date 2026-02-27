@@ -1,6 +1,16 @@
 -- Power Charger: charges armor batteries from the electric network
 
 local SEARCH_RADIUS = 18 -- tiles, covers largest pole supply area (substation)
+local PLAYER_CHEST_Y = -1.2
+
+-- Approximate visual height offsets for pole types (negative = up)
+local POLE_HEIGHT = {
+  ["small-electric-pole"]  = -2.0,
+  ["medium-electric-pole"] = -2.8,
+  ["big-electric-pole"]    = -3.0,
+  ["substation"]           = -2.5,
+}
+local DEFAULT_POLE_HEIGHT = -2.5
 
 local function get_interval()
   return settings.global["power-charger-interval-ticks"].value
@@ -71,6 +81,10 @@ local function get_battery_deficits(grid)
   return deficits
 end
 
+local function get_pole_height(pole)
+  return POLE_HEIGHT[pole.name] or DEFAULT_POLE_HEIGHT
+end
+
 local function draw_charge_arc(player, pole)
   local ttl = 5 -- very short lived, redrawn every interval for fast flicker
   local pole_pos = pole.position
@@ -78,8 +92,7 @@ local function draw_charge_arc(player, pole)
   local dx = player_pos.x - pole_pos.x
   local dy = player_pos.y - pole_pos.y
 
-  local pole_top_y = -3.5
-  local player_chest_y = -1.2
+  local pole_top_y = get_pole_height(pole)
   local pole_ref = {pole_pos.x, pole_pos.y + pole_top_y}
 
   for arc = 1, 4 do
@@ -91,7 +104,7 @@ local function draw_charge_arc(player, pole)
       local ox = (math.random() - 0.5) * jitter
       local oy = (math.random() - 0.5) * jitter
       -- Interpolate height offset from pole top to player chest
-      local height_offset = pole_top_y * (1 - t) + player_chest_y * t
+      local height_offset = pole_top_y * (1 - t) + PLAYER_CHEST_Y * t
       local offset_x = -dx * (1 - t) + ox
       local offset_y = -dy * (1 - t) + height_offset + oy
       local next_ref = {entity = player.character, offset = {offset_x, offset_y}}
@@ -110,7 +123,7 @@ local function draw_charge_arc(player, pole)
       color = {r = 0.5, g = 0.7, b = 1, a = 0.8},
       width = 2 + math.random() * 2,
       from = prev,
-      to = {entity = player.character, offset = {0, player_chest_y}},
+      to = {entity = player.character, offset = {0, PLAYER_CHEST_Y}},
       surface = player.surface,
       time_to_live = ttl,
     }
@@ -118,7 +131,7 @@ local function draw_charge_arc(player, pole)
 
   rendering.draw_light{
     sprite = "utility/light_medium",
-    target = {entity = player.character, offset = {0, player_chest_y}},
+    target = {entity = player.character, offset = {0, PLAYER_CHEST_Y}},
     surface = player.surface,
     color = {r = 0.2, g = 0.4, b = 1},
     intensity = 0.5,

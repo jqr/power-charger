@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 26. 02. 2026
+
+  Bugfixes:
+    - Fixed crash with modded battery types (e.g. battery-mk3-equipment) by adding a generic fallback shadow entity
+    - Fixed shadow entities not being cleaned up when player changes surface (e.g. traveling to another planet in Space Age)
+  Optimizations:
+    - Cached active pole reference so lightning arc redraws skip the spatial search
+  Features:
+    - Added native support for Space Age battery-mk3-equipment in power consumption stats
+    - Removed configurable interval setting, hardcoded to sensible defaults
+    - Lightning arcs now attach to the correct height for each pole type instead of always using substation height
+    - Added 9 locales: German, French, Spanish, Brazilian Portuguese, Japanese, Chinese, Russian, Korean, Polish
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 25. 02. 2026
 

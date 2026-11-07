@@ -191,13 +191,22 @@ local function check_surface_change(player)
   return false
 end
 
+local function check_surface_change2(player)
+  local current = player.surface.index
+  local prev = storage.player_surfaces[player.index]
+  if prev and prev ~= current then
+    return true
+  end
+  return false
+end
+
 -- Visual-only: redraw arcs every ARC_INTERVAL ticks
 local function on_arc_tick(event)
   for _, player in pairs(game.connected_players) do
     if not player.character then goto continue end
 
     local pole = storage.active_poles[player.index]
-    if pole and pole.valid then
+    if pole and pole.valid and (not check_surface_change2(player)) then
       draw_charge_arc(player, pole)
     end
 
